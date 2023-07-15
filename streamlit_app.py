@@ -3,6 +3,7 @@ import geopy
 from geopy.geocoders import Nominatim 
 from fpdf import FPDF
 from shapely.geometry import Polygon
+import matplotlib.pyplot as plt
 
 # Load API key from secrets
 api_key = st.secrets["MAPS_API"] 
@@ -53,6 +54,9 @@ def draw_polygon(center, size):
                      (center[0]-size, center[1]+size)])
   return polygon
 
+def update_polygon(click):
+  poly.set_xy(polygon.exterior.xy)
+
 def calculate_quote(service, area):
   if service == 'Mowing': 
     return area * 0.01
@@ -85,6 +89,13 @@ else:
   # After geocoding
   polygon = draw_polygon([lat, lon], 0.5) 
 
+  fig, ax = plt.subplots()
+  ax.imshow(map_image)
+  
+  poly = ax.plot(*initial_polygon.exterior.xy, c='r')[0] 
+  
+  st.pyplot(fig)
+
   # Calculate price 
   price = calculate_quote(selected_service, polygon.area)
 
@@ -93,6 +104,15 @@ else:
   
   # Access attributes  
   quote.service = selected_service
+
+  fig.canvas.mpl_connect('button_press_event', update_polygon)
+
+  updated_polygon = poly.get_xy()
+  
+  # Use updated polygon for quote calculation
+  price = calculate_quote(service, updated_polygon.area) 
+  
+  quote = ServiceQuote(service, updated_polygon, price)
   
   # Display quote details
   st.subheader("Quote Summary")
