@@ -84,7 +84,10 @@ else:
 
   # After geocoding
   polygon = draw_polygon([lat, lon], 0.5) 
-  
+
+  # Calculate price 
+  price = calculate_quote(selected_service, polygon.area)
+
   # Create quote
   quote = ServiceQuote(selected_service, polygon, price) 
   
