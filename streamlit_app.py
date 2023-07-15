@@ -4,6 +4,9 @@ from geopy.geocoders import Nominatim
 from fpdf import FPDF
 from shapely.geometry import Polygon
 
+# Load API key from secrets
+api_key = st.secrets["MAPS_API"] 
+
 class User:
   def __init__(self, name, email):
     self.name = name
@@ -63,11 +66,19 @@ if lat is None:
   st.warning("Unable to geocode address")
 else:
   # Create map, polygon, etc
-  polygon = draw_polygon([lat, lon], 0.5) 
-
-  quote = ServiceQuote(selected_service, polygon, calculate_quote(selected_service, polygon.area))
-
-  st.write("Your quote is:", quote.price)
-
-  if st.button('Email Quote'):
-    quote.generate_pdf()
+   
+  # Geocode address
+  lat, lon = geocode(address)
+  
+  # Show map image
+  url = f"https://maps.googleapis.com/maps/api/staticmap?center={lat},{lon}&zoom=18&size=400x400&key={api_key}"
+  st.image(url)
+  
+  # Create quote
+  quote = ServiceQuote(service, polygon, price) 
+  
+  # Display quote details
+  st.subheader("Quote Summary")
+  st.write("Service Type:", quote.service)
+  st.write("Area:", quote.area, "sq. ft")  
+  st.write("Price:", quote.price)
