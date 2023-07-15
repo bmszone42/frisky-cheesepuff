@@ -69,7 +69,7 @@ def calculate_quote(service, area):
 selected_service = st.radio('Service', ['Mowing', 'Tree Trimming']) 
 
 # Address input with autocomplete
-address = st.text_input('Enter address', value=default_address, autocomplete=True)
+address = st.text_input('Enter address', value=default_address)
 
 lat, lon = geocode(address)
 
