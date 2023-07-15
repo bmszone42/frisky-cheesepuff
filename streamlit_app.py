@@ -7,6 +7,9 @@ from shapely.geometry import Polygon
 # Load API key from secrets
 api_key = st.secrets["MAPS_API"] 
 
+# Set map type
+map_type = 'hybrid'  
+
 class User:
   def __init__(self, name, email):
     self.name = name
@@ -59,7 +62,9 @@ def calculate_quote(service, area):
 # Core app code
 selected_service = st.radio('Service', ['Mowing', 'Tree Trimming']) 
 
-address = st.text_input('Address')
+# Address input with autocomplete
+address = st.text_input('Enter address', autocomplete='on')
+
 lat, lon = geocode(address)
 
 if lat is None:
@@ -70,12 +75,15 @@ else:
   # Geocode address
   lat, lon = geocode(address)
   
-  # Show map image
-  url = f"https://maps.googleapis.com/maps/api/staticmap?center={lat},{lon}&zoom=18&size=400x400&key={api_key}"
+
+  # Generate map URL
+  url = f"https://maps.googleapis.com/maps/api/staticmap?center={lat},{lon}&zoom=18&size=400x400&maptype={map_type}&key={api_key}"
+  
+  # Display map
   st.image(url)
   
   # Create quote
-  quote = ServiceQuote(service, polygon, price) 
+  quote = ServiceQuote(selected_service, polygon, price) 
   
   # Display quote details
   st.subheader("Quote Summary")
