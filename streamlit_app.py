@@ -23,7 +23,7 @@ class ServiceArea:
 
 class ServiceQuote:
   def __init__(self, service_type, area, price):
-    self.service_type = service_type
+    self.service = service_type
     self.area = area
     self.price = price
 
