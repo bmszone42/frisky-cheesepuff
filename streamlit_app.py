@@ -11,6 +11,8 @@ api_key = st.secrets["MAPS_API"]
 # Set map type
 map_type = 'hybrid'  
 
+default_address = "5 Randall St, Pembroke, MA 02359"
+
 class User:
   def __init__(self, name, email):
     self.name = name
@@ -67,7 +69,7 @@ def calculate_quote(service, area):
 selected_service = st.radio('Service', ['Mowing', 'Tree Trimming']) 
 
 # Address input with autocomplete
-address = st.text_input('Enter address', autocomplete='on')
+address = st.text_input('Enter address', value=default_address, autocomplete=True)
 
 lat, lon = geocode(address)
 
