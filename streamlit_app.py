@@ -31,8 +31,14 @@ class ServiceQuote:
 # Helper functions
 
 def geocode(address):
+
   geolocator = Nominatim(user_agent="app")
   location = geolocator.geocode(address)
+
+  if location is None:
+    print("Unable to geocode address")
+    return None, None
+  
   return location.latitude, location.longitude
 
 def draw_polygon(center, size):
@@ -53,7 +59,12 @@ def calculate_quote(service, area):
 selected_service = st.radio('Service', ['Mowing', 'Tree Trimming']) 
 
 address = st.text_input('Address')
-lat, lon = geocode(address) 
+lat, lon = geocode(address)
+
+if lat is None:
+  st.warning("Unable to geocode address")
+else:
+  # Create map, polygon, etc
 
 polygon = draw_polygon([lat, lon], 0.5) 
 
