@@ -29,7 +29,6 @@ class ServiceQuote:
     pdf.output('quote.pdf')
 
 # Helper functions
-
 def geocode(address):
 
   geolocator = Nominatim(user_agent="app")
@@ -55,7 +54,6 @@ def calculate_quote(service, area):
     return area * 0.05
 
 # Core app code
-
 selected_service = st.radio('Service', ['Mowing', 'Tree Trimming']) 
 
 address = st.text_input('Address')
@@ -67,9 +65,9 @@ else:
   # Create map, polygon, etc
   polygon = draw_polygon([lat, lon], 0.5) 
 
-quote = ServiceQuote(selected_service, polygon, calculate_quote(selected_service, polygon.area))
+  quote = ServiceQuote(selected_service, polygon, calculate_quote(selected_service, polygon.area))
 
-st.write("Your quote is:", quote.price)
+  st.write("Your quote is:", quote.price)
 
-if st.button('Email Quote'):
-  quote.generate_pdf()
+  if st.button('Email Quote'):
+    quote.generate_pdf()
