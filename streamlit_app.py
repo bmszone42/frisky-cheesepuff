@@ -1,38 +1,65 @@
-from collections import namedtuple
-import altair as alt
-import math
-import pandas as pd
 import streamlit as st
+import geopy
+from geopy.geocoders import Nominatim 
+from fpdf import FPDF
+from shapely.geometry import Polygon
 
-"""
-# Welcome to Streamlit!
+class User:
+  def __init__(self, name, email):
+    self.name = name
+    self.email = email
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:
+class ServiceArea:
+  def __init__(self, address, polygon, size):
+    self.address = address
+    self.polygon = polygon
+    self.size = size
 
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+class ServiceQuote:
+  def __init__(self, service_type, area, price):
+    self.service_type = service_type
+    self.area = area
+    self.price = price
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
+  def generate_pdf(self):
+    pdf = FPDF() 
+    pdf.add_page()
+    pdf.set_font('Arial', 'B', 16)
+    pdf.cell(40, 10, 'Service Quote')
+    pdf.output('quote.pdf')
 
+# Helper functions
 
-with st.echo(code_location='below'):
-    total_points = st.slider("Number of points in spiral", 1, 5000, 2000)
-    num_turns = st.slider("Number of turns in spiral", 1, 100, 9)
+def geocode(address):
+  geolocator = Nominatim(user_agent="app")
+  location = geolocator.geocode(address)
+  return location.latitude, location.longitude
 
-    Point = namedtuple('Point', 'x y')
-    data = []
+def draw_polygon(center, size):
+  polygon = Polygon([(center[0]-size, center[1]-size), 
+                     (center[0]+size, center[1]-size),
+                     (center[0]+size, center[1]+size),
+                     (center[0]-size, center[1]+size)])
+  return polygon
 
-    points_per_turn = total_points / num_turns
+def calculate_quote(service, area):
+  if service == 'Mowing': 
+    return area * 0.01
+  elif service == 'Tree Trimming':
+    return area * 0.05
 
-    for curr_point_num in range(total_points):
-        curr_turn, i = divmod(curr_point_num, points_per_turn)
-        angle = (curr_turn + 1) * 2 * math.pi * i / points_per_turn
-        radius = curr_point_num / total_points
-        x = radius * math.cos(angle)
-        y = radius * math.sin(angle)
-        data.append(Point(x, y))
+# Core app code
 
-    st.altair_chart(alt.Chart(pd.DataFrame(data), height=500, width=500)
-        .mark_circle(color='#0068c9', opacity=0.5)
-        .encode(x='x:Q', y='y:Q'))
+selected_service = st.radio('Service', ['Mowing', 'Tree Trimming']) 
+
+address = st.text_input('Address')
+lat, lon = geocode(address) 
+
+polygon = draw_polygon([lat, lon], 0.5) 
+
+quote = ServiceQuote(selected_service, polygon, calculate_quote(selected_service, polygon.area))
+
+st.write("Your quote is:", quote.price)
+
+if st.button('Email Quote'):
+  quote.generate_pdf()
