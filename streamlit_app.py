@@ -71,17 +71,13 @@ selected_service = st.radio('Service', ['Mowing', 'Tree Trimming'])
 # Address input with autocomplete
 address = st.text_input('Enter address', value=default_address)
 
-lat, lon = geocode(address)
-
 if lat is None:
   st.warning("Unable to geocode address")
 else:
-  # Create map, polygon, etc
    
   # Geocode address
   lat, lon = geocode(address)
   
-
   # Generate map URL
   url = f"https://maps.googleapis.com/maps/api/staticmap?center={lat},{lon}&zoom=18&size=400x400&maptype={map_type}&key={api_key}"
   
