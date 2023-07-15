@@ -81,6 +81,9 @@ else:
   
   # Display map
   st.image(url)
+
+  # After geocoding
+  polygon = draw_polygon([lat, lon], 0.5) 
   
   # Create quote
   quote = ServiceQuote(selected_service, polygon, price) 
