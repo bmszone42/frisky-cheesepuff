@@ -88,8 +88,11 @@ else:
   # Calculate price 
   price = calculate_quote(selected_service, polygon.area)
 
-  # Create quote
-  quote.service = ServiceQuote(selected_service, polygon, price) 
+  # Create quote instance
+  quote = ServiceQuote(selected_service, polygon, price)
+  
+  # Access attributes  
+  quote.service = selected_service
   
   # Display quote details
   st.subheader("Quote Summary")
