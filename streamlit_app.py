@@ -65,8 +65,7 @@ if lat is None:
   st.warning("Unable to geocode address")
 else:
   # Create map, polygon, etc
-
-polygon = draw_polygon([lat, lon], 0.5) 
+  polygon = draw_polygon([lat, lon], 0.5) 
 
 quote = ServiceQuote(selected_service, polygon, calculate_quote(selected_service, polygon.area))
 
