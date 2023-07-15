@@ -86,36 +86,41 @@ else:
   # Display map
   st.image(url)
 
-  # After geocoding
-  polygon = draw_polygon([lat, lon], 0.5) 
+  # Initial polygon based on address
+initial_polygon = draw_polygon([lat, lon], 0.5) 
 
+st.write("Initial service area:", initial_polygon.area, "sq ft")
+
+if st.button('Edit service area'):
+
+  # Show interactive plot
   fig, ax = plt.subplots()
-  ax.imshow(map_image)
-  
-  poly = ax.plot(*initial_polygon.exterior.xy, c='r')[0] 
-  
+  poly = ax.plot(*initial_polygon.exterior.xy)
+
   st.pyplot(fig)
 
-  # Calculate price 
-  price = calculate_quote(selected_service, polygon.area)
+  # Callback to update polygon 
+  def update(click):
+    poly.set_xy(polygon.exterior.xy)  
 
-  # Create quote instance
-  quote = ServiceQuote(selected_service, polygon, price)
-  
-  # Access attributes  
-  quote.service = selected_service
+  fig.canvas.mpl_connect('button_press_event', update)
 
-  fig.canvas.mpl_connect('button_press_event', update_polygon)
+  final_polygon = poly.get_xy()
 
-  updated_polygon = poly.get_xy()
-  
-  # Use updated polygon for quote calculation
-  price = calculate_quote(service, updated_polygon.area) 
-  
-  quote = ServiceQuote(service, updated_polygon, price)
-  
-  # Display quote details
-  st.subheader("Quote Summary")
-  st.write("Service Type:", quote.service)
-  st.write("Area:", quote.area, "sq. ft")  
+else:
+  final_polygon = initial_polygon
+
+# Only if button clicked   
+if st.button("Get Quote"):
+
+  # Calculate price
+  price = calculate_quote(service, final_polygon.area)  
+
+  # Create quote
+  quote = ServiceQuote(service, final_polygon, price)
+
+  # Display quote
+  st.header("Quote")
+  st.write("Service:", quote.service)
+  st.write("Area:", quote.area, "sq ft")
   st.write("Price:", quote.price)
